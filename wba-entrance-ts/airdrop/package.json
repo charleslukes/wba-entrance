@@ -10,9 +10,9 @@
     "enroll": "ts-node ./enroll.ts"
   },
   "dependencies": {
+    "@project-serum/anchor": "^0.26.0",
     "@solana/web3.js": "^1.78.3",
     "@types/node": "^20.4.8",
-    "bs58": "^5.0.0",
     "typescript": "^5.1.6"
   },
   "devDependencies": {
