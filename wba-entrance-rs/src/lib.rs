@@ -70,41 +70,29 @@ mod tests {
     #[test]
     fn transfer_sol() {
         let keypair = read_keypair_file("dev-wallet.json").expect("Couldn't find wallet file");
-        let to_pubkey = Pubkey::from_str("<your WBA public key>").unwrap();
-        let rpc_client = RpcClient::new(RPC_URL);
-
-        let recent_blockhash = rpc_client
-            .get_latest_blockhash()
-            .expect("Failed to get recent blockhash");
-
-        let transaction = Transaction::new_signed_with_payer(
-            &[transfer(&keypair.pubkey(), &to_pubkey, 1_000_000)],
-            Some(&keypair.pubkey()),
-            &vec![&keypair],
-            recent_blockhash,
-        );
-
-        let signature = rpc_client
-            .send_and_confirm_transaction(&transaction)
-            .expect("Failed to send transaction");
-        println!(
-            "Success! Check out your TX here: https://explorer.solana.com/tx/{}/?cluster=devnet",
-            signature
-        );
-    }
-
-    #[test]
-    fn empty_devnet() {
-        let keypair = read_keypair_file("dev-wallet.json").expect("Couldn't find wallet file");
         let to_pubkey = Pubkey::from_str("A1w5cGXyB5DZRKYNpmmiMQYJqxb85yWDzY2LQHA9eBBk").unwrap();
         let rpc_client = RpcClient::new(RPC_URL);
 
+        let balance = rpc_client
+            .get_balance(&keypair.pubkey())
+            .expect("Failed to get balance");
+
         let recent_blockhash = rpc_client
             .get_latest_blockhash()
             .expect("Failed to get recent blockhash");
 
+        let message = Message::new_with_blockhash(
+            &[transfer(&keypair.pubkey(), &to_pubkey, balance)],
+            Some(&keypair.pubkey()),
+            &recent_blockhash,
+        );
+
+        let fee = rpc_client
+            .get_fee_for_message(&message)
+            .expect("Failed to get fee calculator");
+
         let transaction = Transaction::new_signed_with_payer(
-            &[transfer(&keypair.pubkey(), &to_pubkey, 1_000_000)],
+            &[transfer(&keypair.pubkey(), &to_pubkey, balance - fee)],
             Some(&keypair.pubkey()),
             &vec![&keypair],
             recent_blockhash,
@@ -118,5 +106,4 @@ mod tests {
             signature
         );
     }
-
 }
