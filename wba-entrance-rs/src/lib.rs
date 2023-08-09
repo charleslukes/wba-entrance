@@ -12,7 +12,7 @@ mod tests {
     };
     use std::io::{self, BufRead};
     use std::str::FromStr;
-    use crate::programs::wba_prereq::{WbaPrereqProgram, CompleteArgs, UpdateArgs};
+    use crate::programs::wba_prereq::{WbaPrereqProgram, CompleteArgs};
 
     const RPC_URL: &str = "https://api.devnet.solana.com";
 
